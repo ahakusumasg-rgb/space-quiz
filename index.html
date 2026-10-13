@@ -66,6 +66,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        flex-wrap: wrap;
         gap: 10px;
         margin: 3px 0 17px;
         padding: 11px 10px 9px;
@@ -172,6 +173,20 @@
         font-size: 1.03rem;
         margin: 0 0 14px;
         font-weight: 600;
+      }
+
+      .difficulty-screen {
+        text-align: center;
+      }
+
+      .difficulty-screen h2 {
+        margin: 0 0 6px;
+        font-size: 1.15rem;
+      }
+
+      .difficulty-screen p {
+        margin: 0 0 16px;
+        color: var(--muted);
       }
 
       .answers {
@@ -304,6 +319,7 @@
     <main class="quiz" aria-live="polite">
       <div class="topbar" aria-label="Mission status">
         <span class="tag" id="counter">Question 1/10</span>
+        <span class="tag" id="difficulty-status" hidden>Difficulty: Normal</span>
         <span class="tag" id="score">Score: 0</span>
       </div>
       <div class="progress-wrap" aria-label="Quiz progress">
@@ -312,6 +328,22 @@
 
       <h1>🚀 Space Exploration Quiz</h1>
       <p class="subtitle">Test your cosmic knowledge in 10 quick questions.</p>
+
+      <section class="difficulty-screen" id="difficulty-screen">
+        <h2>Choose your mission difficulty</h2>
+        <p>Pick a level before launch.</p>
+        <div class="answers" id="difficulty-options">
+          <button class="btn" type="button" data-difficulty="easy">
+            Easy <span aria-hidden="true">🌙</span>
+          </button>
+          <button class="btn" type="button" data-difficulty="normal">
+            Normal <span aria-hidden="true">🛰️</span>
+          </button>
+          <button class="btn" type="button" data-difficulty="hard">
+            Hard <span aria-hidden="true">🌠</span>
+          </button>
+        </div>
+      </section>
 
       <section id="quiz-screen">
         <p class="question" id="question"></p>
@@ -329,72 +361,187 @@
     </main>
 
     <script>
-      const questions = [
-        {
-          q: "Which planet in our solar system has the most moons discovered so far?",
-          choices: ["Mars", "Jupiter", "Saturn", "Neptune"],
-          answer: 2
-        },
-        {
-          q: "What was the first spacecraft to land humans on the Moon?",
-          choices: ["Apollo 8", "Apollo 11", "Luna 9", "Vostok 1"],
-          answer: 1
-        },
-        {
-          q: "What does ISS stand for?",
-          choices: [
-            "Interstellar Science Station",
-            "International Space Station",
-            "International Satellite System",
-            "Integrated Space Shuttle"
-          ],
-          answer: 1
-        },
-        {
-          q: "Which rover successfully landed on Mars in 2021?",
-          choices: ["Curiosity", "Spirit", "Perseverance", "Opportunity"],
-          answer: 2
-        },
-        {
-          q: "What is the name of NASA's powerful space telescope launched in 2021?",
-          choices: [
-            "Hubble II",
-            "Chandra X-Ray Observatory",
-            "Kepler",
-            "James Webb Space Telescope"
-          ],
-          answer: 3
-        },
-        {
-          q: "Which celestial body is known as a 'dirty snowball'?",
-          choices: ["Comet", "Asteroid", "Meteor", "Dwarf planet"],
-          answer: 0
-        },
-        {
-          q: "Which planet is famous for its Great Red Spot storm?",
-          choices: ["Mercury", "Earth", "Jupiter", "Uranus"],
-          answer: 2
-        },
-        {
-          q: "What is the boundary around a black hole called?",
-          choices: ["Photon ring", "Event horizon", "Gravitational shell", "Dark frontier"],
-          answer: 1
-        },
-        {
-          q: "Which mission carried the first humans into space?",
-          choices: ["Mercury-Redstone 3", "Vostok 1", "Gemini 4", "Soyuz 1"],
-          answer: 1
-        },
-        {
-          q: "What is the largest known volcano in the solar system?",
-          choices: ["Mauna Loa", "Olympus Mons", "Arsia Mons", "Elysium Mons"],
-          answer: 1
-        }
-      ];
+      const questionSets = {
+        easy: [
+          {
+            q: "Which planet do we live on?",
+            choices: ["Mars", "Earth", "Venus", "Jupiter"],
+            answer: 1
+          },
+          {
+            q: "What is the name of Earth's natural satellite?",
+            choices: ["The Moon", "Phobos", "Europa", "Titan"],
+            answer: 0
+          },
+          {
+            q: "Which star is at the center of our solar system?",
+            choices: ["Sirius", "Polaris", "The Sun", "Betelgeuse"],
+            answer: 2
+          },
+          {
+            q: "Which planet is known as the Red Planet?",
+            choices: ["Mars", "Mercury", "Neptune", "Saturn"],
+            answer: 0
+          },
+          {
+            q: "What do astronauts wear to stay safe in space?",
+            choices: ["Diving suits", "Space suits", "Raincoats", "Lab coats"],
+            answer: 1
+          },
+          {
+            q: "Which object gives off a bright streak when it enters Earth's atmosphere?",
+            choices: ["Meteor", "Moon", "Galaxy", "Comet tail"],
+            answer: 0
+          },
+          {
+            q: "What force keeps planets in orbit around the Sun?",
+            choices: ["Magnetism", "Friction", "Gravity", "Electricity"],
+            answer: 2
+          },
+          {
+            q: "Which planet is famous for its prominent rings?",
+            choices: ["Earth", "Saturn", "Venus", "Mars"],
+            answer: 1
+          },
+          {
+            q: "What is the name of the galaxy containing our solar system?",
+            choices: ["Andromeda", "Whirlpool", "Milky Way", "Sombrero"],
+            answer: 2
+          },
+          {
+            q: "What is a vehicle used to travel into space called?",
+            choices: ["Submarine", "Rocket", "Glider", "Locomotive"],
+            answer: 1
+          }
+        ],
+        normal: [
+          {
+            q: "Which planet in our solar system has the most moons discovered so far?",
+            choices: ["Mars", "Jupiter", "Saturn", "Neptune"],
+            answer: 2
+          },
+          {
+            q: "What was the first spacecraft to land humans on the Moon?",
+            choices: ["Apollo 8", "Apollo 11", "Luna 9", "Vostok 1"],
+            answer: 1
+          },
+          {
+            q: "What does ISS stand for?",
+            choices: [
+              "Interstellar Science Station",
+              "International Space Station",
+              "International Satellite System",
+              "Integrated Space Shuttle"
+            ],
+            answer: 1
+          },
+          {
+            q: "Which rover successfully landed on Mars in 2021?",
+            choices: ["Curiosity", "Spirit", "Perseverance", "Opportunity"],
+            answer: 2
+          },
+          {
+            q: "What is the name of NASA's powerful space telescope launched in 2021?",
+            choices: [
+              "Hubble II",
+              "Chandra X-Ray Observatory",
+              "Kepler",
+              "James Webb Space Telescope"
+            ],
+            answer: 3
+          },
+          {
+            q: "Which celestial body is known as a 'dirty snowball'?",
+            choices: ["Comet", "Asteroid", "Meteor", "Dwarf planet"],
+            answer: 0
+          },
+          {
+            q: "Which planet is famous for its Great Red Spot storm?",
+            choices: ["Mercury", "Earth", "Jupiter", "Uranus"],
+            answer: 2
+          },
+          {
+            q: "What is the boundary around a black hole called?",
+            choices: ["Photon ring", "Event horizon", "Gravitational shell", "Dark frontier"],
+            answer: 1
+          },
+          {
+            q: "Which mission carried the first humans into space?",
+            choices: ["Mercury-Redstone 3", "Vostok 1", "Gemini 4", "Soyuz 1"],
+            answer: 1
+          },
+          {
+            q: "What is the largest known volcano in the solar system?",
+            choices: ["Mauna Loa", "Olympus Mons", "Arsia Mons", "Elysium Mons"],
+            answer: 1
+          }
+        ],
+        hard: [
+          {
+            q: "Which resonance helps keep Neptune's moon Triton in a stable, retrograde orbit?",
+            choices: ["Spin-orbit resonance", "No resonance; Triton's orbit is chaotic", "Apsidal resonance", "It is tidally locked to the Sun"],
+            answer: 1
+          },
+          {
+            q: "What is the primary reason Venus rotates in the opposite direction to most planets?",
+            choices: ["Its dense atmosphere reverses the rotation", "A giant impact likely altered its spin", "Solar wind pushed it backward", "Its orbit is retrograde"],
+            answer: 1
+          },
+          {
+            q: "Which type of star results when a massive star's core collapses but avoids becoming a black hole?",
+            choices: ["White dwarf", "Neutron star", "Brown dwarf", "Red giant"],
+            answer: 1
+          },
+          {
+            q: "The Roche limit describes the distance inside which a moon may be torn apart by what?",
+            choices: ["Solar radiation", "A planet's tidal forces", "Magnetic storms", "Atmospheric drag"],
+            answer: 1
+          },
+          {
+            q: "What is the name for the apparent shift in a star's position caused by Earth's orbit around the Sun?",
+            choices: ["Parallax", "Aberration", "Redshift", "Precession"],
+            answer: 0
+          },
+          {
+            q: "Which spacecraft first returned samples from an asteroid to Earth?",
+            choices: ["Hayabusa", "Cassini", "Galileo", "New Horizons"],
+            answer: 0
+          },
+          {
+            q: "What boundary separates the Sun's heliosphere from interstellar space?",
+            choices: ["Magnetopause", "Heliopause", "Photosphere", "Termination ring"],
+            answer: 1
+          },
+          {
+            q: "Why do pulsars emit regular pulses of radio waves?",
+            choices: ["They orbit a companion star", "Their rotating beams sweep across Earth", "They periodically explode", "Their magnetic fields switch off and on"],
+            answer: 1
+          },
+          {
+            q: "Which observation is strongest evidence for an exoplanet transiting its star?",
+            choices: ["A repeating dip in the star's brightness", "A blue color shift", "A single radio burst", "A stationary dust cloud"],
+            answer: 0
+          },
+          {
+            q: "What is the cosmic microwave background primarily a remnant of?",
+            choices: ["The first stars' light", "The Big Bang's early radiation", "Radiation from black holes", "Collision of the Milky Way and Andromeda"],
+            answer: 1
+          }
+        ]
+      };
+
+      const difficultyLabels = {
+        easy: "Easy",
+        normal: "Normal",
+        hard: "Hard"
+      };
 
       const counterEl = document.getElementById("counter");
+      const difficultyStatusEl = document.getElementById("difficulty-status");
       const scoreEl = document.getElementById("score");
       const progressEl = document.getElementById("progress");
+      const difficultyScreen = document.getElementById("difficulty-screen");
+      const difficultyButtons = document.querySelectorAll("[data-difficulty]");
       const questionEl = document.getElementById("question");
       const answersEl = document.getElementById("answers");
       const feedbackEl = document.getElementById("feedback");
@@ -407,6 +554,8 @@
 
       let current = 0;
       let score = 0;
+      let difficulty = "";
+      let questions = [];
 
       function getResult(scoreValue, total) {
         const pct = scoreValue / total;
@@ -419,6 +568,7 @@
 
       function updateHeader() {
         counterEl.textContent = `Question ${Math.min(current + 1, questions.length)}/${questions.length}`;
+        difficultyStatusEl.textContent = `Difficulty: ${difficultyLabels[difficulty]}`;
         scoreEl.textContent = `Score: ${score}`;
         progressEl.style.width = `${(current / questions.length) * 100}%`;
       }
@@ -484,16 +634,42 @@
         resultNoteEl.textContent = result.note;
       }
 
-      function restartQuiz() {
+      function startQuiz(selectedDifficulty) {
+        difficulty = selectedDifficulty;
+        questions = questionSets[difficulty];
         current = 0;
         score = 0;
+        difficultyScreen.hidden = true;
+        difficultyStatusEl.hidden = false;
+        document.querySelector(".topbar").hidden = false;
+        document.querySelector(".progress-wrap").hidden = false;
         quizScreen.hidden = false;
         resultScreen.hidden = true;
         renderQuestion();
+        answersEl.querySelector("button")?.focus();
       }
 
+      function restartQuiz() {
+        current = 0;
+        score = 0;
+        difficulty = "";
+        questions = [];
+        document.querySelector(".topbar").hidden = true;
+        document.querySelector(".progress-wrap").hidden = true;
+        difficultyStatusEl.hidden = true;
+        quizScreen.hidden = true;
+        resultScreen.hidden = true;
+        difficultyScreen.hidden = false;
+        difficultyButtons[0].focus();
+      }
+
+      difficultyButtons.forEach((button) => {
+        button.addEventListener("click", () => startQuiz(button.dataset.difficulty));
+      });
       restartBtn.addEventListener("click", restartQuiz);
-      renderQuestion();
+      document.querySelector(".topbar").hidden = true;
+      document.querySelector(".progress-wrap").hidden = true;
+      quizScreen.hidden = true;
     </script>
   </body>
 </html>
